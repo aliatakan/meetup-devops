@@ -1,0 +1,30 @@
+---
+- name: Meetup Build yaml
+  hosts: localhost
+  tasks:
+  - name: Include variables
+    include_vars: variables.yaml
+    
+  - name: Create a working directory
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+
+  - name: Get package from artifactory
+    get_url: url=https://artifactory.softbased.com/artifactory/libs-release-local/com/example/{{ app_name }}/{{ app_version }}/{{ app_name }}-{{ app_version }}.jar dest={{ working_dir }}
+
+  - name: Copy dockerfile to the working_dir
+    copy: src=../dockerfiles/{{ app_name }}.df dest={{ working_dir }}/Dockerfile
+
+
+  - name: Build image
+    command: docker build -t awsmeetup34/{{ app_name }}:{{ app_version }} .
+    args:
+      chdir: "{{ working_dir }}"
+
+  - name: Login to the dockerhub
+    command: docker login -u {{ dh_user }} -p {{ dh_pass }}
+
+  - name: Push image to the dockerhub
+    command: docker push awsmeetup34/{{ app_name }}:{{ app_version }}
+

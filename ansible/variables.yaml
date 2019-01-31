@@ -1,0 +1,6 @@
+---
+app_name: "{{ app_name }}"
+app_version: "{{ app_version }}"
+working_dir: "{{ app_version | replace('.','-') }}"
+dh_user: "awsmeetup34"
+dh_pass: "aws34meetup*"
